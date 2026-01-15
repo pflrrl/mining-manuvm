@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ManuVM | Mining OS</title>
+    <link rel="stylesheet" href="cdnjs.cloudflare.com"/>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #4ade80; 
+            --accent: #22d3ee;
+            --danger: #ff4b5c;
+            --success: #4ade80;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: white;
+            background: #020617;
+            background-image: 
+                radial-gradient(circle at 5% 5%, rgba(74, 222, 128, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 95% 95%, rgba(34, 211, 238, 0.08) 0%, transparent 50%);
+            min-height: 250vh; /* Espacio extra para las nuevas cards */
+        }
+
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 30px 6%;
+            display: flex; justify-content: space-between; z-index: 1000;
+            background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(10px);
+        }
+
+        section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 60px 20px; }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            padding: 60px;
+            width: 100%; max-width: 950px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+        }
+
+        h1 { font-size: 8rem; font-weight: 900; letter-spacing: -6px; margin: 0; line-height: 0.9; }
+        .tagline { font-size: 1.2rem; opacity: 0.4; margin-top: 15px; text-transform: uppercase; }
+
+        /* Métrica y VM */
+        .miner-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 30px; margin: 50px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 40px;
+        }
+        .stat-item span { font-size: 2rem; font-weight: 800; color: var(--primary); }
+
+        .vm-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 25px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* Estados dinámicos */
+        .vm-status { display: flex; align-items: center; gap: 10px; font-weight: 900; }
+        .pulse-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .status-on { color: var(--success); }
+        .status-on .pulse-dot { background: var(--success); box-shadow: 0 0 15px var(--success); }
+        .status-off { color: var(--danger); }
+        .status-off .pulse-dot { background: var(--danger); box-shadow: 0 0 15px var(--danger); }
+
+        /* --- NUEVA CARD: ESTADO MINANDO --- */
+        .mining-card {
+            margin-top: 50px;
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(0,0,0,0.4));
+            border: 2px solid var(--primary);
+            border-radius: 30px;
+            padding: 40px;
+            width: 100%; max-width: 950px;
+            display: flex; justify-content: space-between; align-items: center;
+            backdrop-filter: blur(20px);
+        }
+
+        .mining-info h3 { font-size: 2.5rem; letter-spacing: -1px; }
+
+        /* Animación del Martillo */
+        .hammer-container {
+            font-size: 4rem;
+            animation: hammerSwing 1s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        @keyframes hammerSwing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-45deg); }
+        }
+
+        /* GitHub Link */
+        .github-link {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            text-decoration: none; color: white; transition: 0.4s;
+            margin-top: 50px; width: 100%; max-width: 950px;
+        }
+        .github-link:hover { border-color: var(--primary); background: rgba(255,255,255,0.1); }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div style="font-weight: 900; color: var(--primary);">MANUVM // CORE</div>
+        <div style="font-size: 0.75rem; opacity: 0.5;">2026_EDITION</div>
+    </nav>
+
+    <section id="inicio">
+        <h1 class="animate__animated animate__fadeInDown">ManuVM</h1>
+        <p class="tagline animate__animated animate__fadeInUp">ManuVM edicion express npm 2026</p>
+    </section>
+
+    <section id="admin">
+        <!-- Panel Principal -->
+        <div class="glass-panel">
+            <h2 style="font-size: 1.8rem; margin-bottom: 5px;">Dashboard del Rig</h2>
+            
+            <div class="miner-stats">
+                <div class="stat-item"><p>HASHRATE</p><span id="hash-val">0.00 MH/s</span></div>
+                <div class="stat-item"><p>CPU</p><span id="cpu-val">0.00%</span></div>
+                <div class="stat-item"><p>UPTIME</p><span id="uptime-val">...</span></div>
+            </div>
+
+            <div class="vm-container">
+                <p style="font-size: 0.8rem; opacity: 0.3; margin-bottom: 15px;">VIRTUAL_MACHINES</p>
+                <div class="vm-card">
+                    <div class="vm-name">linux mint 1</div>
+                    <div id="status-container" class="vm-status status-off">
+                        <div class="pulse-dot"></div> <span id="status-text">APAGADA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: ESTADO MINANDO CON MARTILLO -->
+        <div class="mining-card animate__animated animate__pulse animate__infinite">
+            <div class="mining-info">
+                <p style="color: var(--primary); font-weight: bold; letter-spacing: 2px;">STATUS_REPORT</p>
+                <h3>Estado: Minando</h3>
+                <p style="opacity: 0.6;">Protocolo de extracción activo en la red ManuVM</p>
+            </div>
+            <div class="hammer-container">
+                ⚒️
+            </div>
+        </div>
+
+        <!-- SECCIÓN: GITHUB -->
+        <a href="https://github.com" target="_blank" class="github-link">
+            <div>
+                <h3 style="font-size: 1.1rem;">Repositorio Oficial</h3>
+                <p style="opacity: 0.4; font-size: 0.8rem;">Acceder al código fuente</p>
+            </div>
+            <div style="font-size: 1.2rem; color: var(--primary);">GITHUB ↗</div>
+        </a>
+    </section>
+
+    <script>
+        async function fetchMetrics() {
+            try {
+                const res = await fetch('/stats');
+                const data = await res.json();
+                document.getElementById('cpu-val').innerText = data.cpu;
+                document.getElementById('uptime-val').innerText = data.uptime;
+                document.getElementById('hash-val').innerText = (Math.random() * 5 + 40).toFixed(2) + " MH/s";
+            } catch(e) {}
+        }
+
+        // Lógica de cambio cada 5 min (300.000 ms)
+        let isOnline = false;
+        function toggleVM() {
+            const container = document.getElementById('status-container');
+            const text = document.getElementById('status-text');
+            isOnline = !isOnline;
+            if (isOnline) {
+                container.className = "vm-status status-on";
+                text.innerText = "ENCENDIDO";
+            } else {
+                container.className = "vm-status status-off";
+                text.innerText = "APAGADA";
+            }
+        }
+
+        setInterval(toggleVM, 300000); // 5 minutos
+        setInterval(fetchMetrics, 2000);
+        fetchMetrics();
+    </script>
+</body>
+</html>
